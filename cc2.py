@@ -2,9 +2,9 @@
 
 #Reference: Chat Gpt Assisted
 
-# Script:   code challenge 1               
+# Script:   code challenge 2               
 # Author: Raheem Sharif Reed                     
-# Date of latest revision: July 11,2023     
+# Date of latest revision: July 12,2023     
 # Purpose:Transmit a single ICMP (ping) packet to a specific IP every two seconds.
 #Evaluate the response as either success or failure.
 #Assign success or failure to a status variable.
