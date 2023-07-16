@@ -15,54 +15,75 @@
 
 
 
-import datetime
-import os
-import time
 import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import requests
+import time
 
+# Function to send email notification
+def send_email(sender_email, sender_password, receiver_email, subject, message):
+    msg = MIMEMultipart()
+    msg['From'] = sender_email
+    msg['To'] = receiver_email
+    msg['Subject'] = subject
+    msg.attach(MIMEText(message, 'plain'))
 
-#declare Variable
-email = input("enter your email")
-password = ("enter your password:")
-ip=input("please porvide an ip address")
-up= "host is down"
-down= "host is down"
+    # Create SMTP connection and send email
+    with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
+        smtp.starttls()
+        smtp.login(sender_email, "wmbp ylwe zhlh ualv")
+        smtp.send_message(msg)
 
-#check the status change
-last=0
+# Function to check host status
+def check_host_status(url):
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            return "up"
+        else:
+            return "down"
+    except requests.ConnectionError:
+        return "down"
 
-#declare functions
+# Main function
+def main():
+    # Get user email and password
+    sender_email = input("Enter your email address: ")
+    sender_password = input("Enter your email password: ")
+    receiver_email = input("Enter the receiver's email address: ")
 
-#functions that handles when the host goes from down to up
-def send_notification_email(email, password, recipient, host, previous_status, current_status):
+    # Dictionary to store host statuses
+    host_statuses = {}
 
-#gets timestamp
- def get_current_timestamp():
-    timestamp = datetime.datetime.now()
-    return timestamp
+    while True:
+        # Specify the host URLs to monitor
+        hosts = {
+            'Google': 'https://www.google.com',
+            'Facebook': 'https://www.facebook.com',
+            'Twitter': 'https://www.twitter.com'
+        }
 
-# Example usage
-current_timestamp = "get_current_timestamp"()
-print("Current Timestamp:", current_timestamp)
+        for host, url in hosts.items():
+            current_status = check_host_status(url)
+            if host not in host_statuses:
+                host_statuses[host] = current_status
+                continue
 
-#creates smtp session
-s= smtplib.smtp('smtp.gmail.com,587')
+            previous_status = host_statuses[host]
+            if current_status != previous_status:
+                timestamp = time.strftime('%Y-%m-%d %H:%M:%S')
+                message = f"Host: {host}\nStatus Changed: {previous_status} -> {current_status}\nTimestamp: {timestamp}"
+                subject = f"Host Status Changed: {host} is {current_status.upper()}"
+                send_email(sender_email, sender_password, receiver_email, subject, message)
+                host_statuses[host] = current_status
 
+        # Wait for 5 minutes before checking again
+        time.sleep(300)
 
-#start tls for security
-s= "starttls"()
+if __name__ == "__main__":
+    main()
 
-#authentication
-s.login("raheem6463@gmail.com,wmbp ylwe zhlh ualv")
-
-#message to be sent
-message = "surpass your limits"
-
-#sending the mail
-s.sendmail("raheem6463@gmail.com,receiver_email_id,message")
-
-#terminating the session
-s.quit()
 
 
 
