@@ -32,7 +32,7 @@ def send_email(sender_email, sender_password, receiver_email, subject, message):
     # Create SMTP connection and send email
     with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
         smtp.starttls()
-        smtp.login(sender_email, "wmbp ylwe zhlh ualv")
+        smtp.login(sender_email,sender_password)
         smtp.send_message(msg)
 
 # Function to check host status
