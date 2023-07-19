@@ -29,59 +29,12 @@
 import os
 from cryptography.fernet import Fernet
 
-# Generate a new encryption key
-encryption_key = Fernet.generate_key()
-
-def encrypt_file(file_path, key):
-    with open(file_path, 'rb') as file:
-        data = file.read()
-    
-    fernet = Fernet(key)
-    encrypted_data = fernet.encrypt(data)
-    
-    with open(file_path, 'wb') as file:
-        file.write(encrypted_data)
-
-def decrypt_file(file_path, key):
-    with open(file_path, 'rb') as file:
-        encrypted_data = file.read()
-    
-    fernet = Fernet(key)
-    decrypted_data = fernet.decrypt(encrypted_data)
-    
-    with open(file_path, 'wb') as file:
-        file.write(decrypted_data)
-
-def encrypt_folder(folder_path, key):
-    for root, dirs, files in os.walk(folder_path):
-        for file in files:
-            file_path = os.path.join(root, file)
-            encrypt_file(file_path, key)
-
-def decrypt_folder(folder_path, key):
-    for root, dirs, files in os.walk(folder_path):
-        for file in files:
-            file_path = os.path.join(root, file)
-            decrypt_file(file_path, key)
-
-# Example usage
-folder_to_encrypt = '/path/to/folder'
-folder_to_decrypt = '/path/to/encrypted/folder'
-
-# Encrypt the folder and its contents
-encrypt_folder(folder_to_encrypt, encryption_key)
-print("Folder encrypted successfully.")
-
-# Decrypt the encrypted folder and its contents
-decrypt_folder(folder_to_decrypt, encryption_key)
-print("Folder decrypted successfully.")
-
-
 # Function to generate a new encryption key
 def generate_key():
     key = Fernet.generate_key()
     with open("key.key", "wb") as key_file:
         key_file.write(key)
+    return key
 
 # Function to load the encryption key
 def load_key():
@@ -107,42 +60,40 @@ def decrypt_file(file_path, key):
     with open(file_path, "wb") as file:
         file.write(decrypted_data)
 
-# Function to encrypt a string
-def encrypt_string(text, key):
-    fernet = Fernet(key)
-    encrypted_text = fernet.encrypt(text.encode())
-    print("Ciphertext:", encrypted_text.decode())
+# Function to encrypt all files in a folder and its subfolders
+def encrypt_folder(folder_path, key):
+    for root, dirs, files in os.walk(folder_path):
+        for file in files:
+            file_path = os.path.join(root, file)
+            encrypt_file(file_path, key)
 
-# Function to decrypt a string
-def decrypt_string(ciphertext, key):
-    fernet = Fernet(key)
-    decrypted_text = fernet.decrypt(ciphertext.encode())
-    print("Cleartext:", decrypted_text.decode())
+# Function to decrypt all files in a folder and its subfolders
+def decrypt_folder(folder_path, key):
+    for root, dirs, files in os.walk(folder_path):
+        for file in files:
+            file_path = os.path.join(root, file)
+            decrypt_file(file_path, key)
 
 # Main function
 def main():
-    mode = int(input("Select a mode:\n1. Encrypt a file\n2. Decrypt a file\n3. Encrypt a message\n4. Decrypt a message\n"))
+    if not os.path.exists("key.key"):
+        generate_key()
 
-    if mode == 1 or mode == 2:
-        file_path = input("Enter the file path: ")
-        key = load_key()
+    mode = int(input("Select a mode:\n1. Encrypt a folder\n2. Decrypt a folder\n"))
 
-        if mode == 1:
-            encrypt_file(file_path, key)
-            print("File encrypted successfully.")
-        else:
-            decrypt_file(file_path, key)
-            print("File decrypted successfully.")
-    elif mode == 3 or mode == 4:
-        text = input("Enter the text: ")
-        key = load_key()
+    folder_to_encrypt = input("Enter the folder path: ")
 
-        if mode == 3:
-            encrypt_string(text, key)
-        else:
-            decrypt_string(text, key)
+    key = load_key()
+
+    if mode == 1:
+        encrypt_folder(folder_to_encrypt, key)
+        print("Folder encrypted successfully.")
+    elif mode == 2:
+        decrypt_folder(folder_to_encrypt, key)
+        print("Folder decrypted successfully.")
     else:
         print("Invalid mode selected.")
 
 if __name__ == "__main__":
     main()
+
