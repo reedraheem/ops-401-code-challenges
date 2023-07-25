@@ -13,7 +13,7 @@
 #If flag 0x14 received, notify user the port is closed.
 #If no flag is received, notify the user the port is filtered and silently dropped.
 
-from scapy.all import srl, IP, TCP
+from scapy.all import sr1, IP, TCP
 
 def tcp_port_scan_with_notifications(host, port_range):
     open_ports = []
@@ -21,7 +21,7 @@ def tcp_port_scan_with_notifications(host, port_range):
     filtered_ports = []
     
     for port in port_range:
-        response = srl(IP(dst=host)/TCP(dport=port, flags='S'), timeout=1, verbose=False)
+        response = sr1(IP(dst=host)/TCP(dport=port, flags='S'), timeout=1, verbose=False)
         
         if response and response[0]:
             response_pkt = response[0][0]
