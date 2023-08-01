@@ -14,6 +14,9 @@
 #Accepts a user input word list file path.
 #Search the word list for the user input string.
 #Print to the screen whether the string appeared in the word list
+#Authenticate to an SSH server by its IP address.
+#Assume the username and IP are known inputs and attempt each word on the provided word list until successful login takes place.
+
 
 import paramiko
 import time
