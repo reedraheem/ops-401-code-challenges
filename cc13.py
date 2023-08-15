@@ -2,9 +2,9 @@
 
 #Reference: Chat Gpt Assisted
 
-# Script:   code challenge 12          
+# Script:   code challenge 13          
 # Author: Raheem Sharif Reed                     
-# Date of latest revision: August 14,2023      
+# Date of latest revision: August 15,2023      
 # Purpose:By now, you will have created several Python scripts in your public repo. Select one of your Python tools created during this class so far that does not have a logging feature. On that tool:
 #Add logging capabilities to your Python tool using the logging library.
 #Experiment with log types. Build in some error handling, then induce some errors. Send log data to a file in the local directory.
