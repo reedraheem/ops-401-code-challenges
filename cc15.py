@@ -14,33 +14,34 @@
 
 
 import os
+import platform
 
 def search_files(directory, filename):
-    num_files_searched = 0
-    num_hits = 0
+    hits = 0
+    searched_files = 0
 
-    for root, _, files in os.walk(directory):
+    for root, dirs, files in os.walk(directory):
         for file in files:
-            num_files_searched += 1
             if filename in file:
-                num_hits += 1
-                print(f"Hit! File '{file}' found in '{os.path.join(root, file)}'")
-
-    return num_files_searched, num_hits
+                hits += 1
+                print(f"Hit: {file} - Location: {os.path.join(root, file)}")
+            searched_files += 1
+    
+    return searched_files, hits
 
 def main():
     filename = input("Enter the file name to search for: ")
     directory = input("Enter the directory to search in: ")
 
-    if not os.path.exists(directory):
-        print("Directory not found.")
-        return
+    if platform.system() == "Windows":
+        directory = directory.replace("/", "\\")
+    
+    searched_files, hits = search_files(directory, filename)
 
-    num_files_searched, num_hits = search_files(directory, filename)
-
-    print("\nSearch summary:")
-    print(f"Files searched: {num_files_searched}")
-    print(f"Hits found: {num_hits}")
+    print(f"\nSearch Summary:")
+    print(f"Total files searched: {searched_files}")
+    print(f"Total hits found: {hits}")
 
 if __name__ == "__main__":
     main()
+
