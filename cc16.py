@@ -23,9 +23,6 @@ import os
 import platform
 import hashlib
 import datetime
-import requests
-
-VIRUSTOTAL_API_KEY = "0e21d353d30719e5c0f552b4d0216e2acbca66e85d7e5c8a31679f97ae5ce09e"
 
 def calculate_md5(file_path):
     hash_md5 = hashlib.md5()
@@ -52,17 +49,6 @@ def search_files(directory, filename):
                 print(f"File Size: {file_size} bytes")
                 print(f"File Path: {file_path}")
                 print(f"MD5 Hash: {file_md5}\n")
-
-                # Connect to VirusTotal API and check MD5 hash
-                params = {'apikey': VIRUSTOTAL_API_KEY, 'resource': file_md5}
-                response = requests.get('https://www.virustotal.com/vtapi/v2/file/report', params=params)
-                json_response = response.json()
-                
-                if json_response['response_code'] == 1:
-                    positives = json_response['positives']
-                    total = json_response['total']
-                    print(f"Positives Detected: {positives}")
-                    print(f"Total Files Scanned: {total}\n")
                 
             searched_files += 1
     
