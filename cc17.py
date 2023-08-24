@@ -22,49 +22,66 @@
 #The script must successfully execute on both Ubuntu Linux 20.04 Focal Fossa and Windows 10.
 
 import os
+import platform
 import hashlib
+import datetime
 import requests
 
+VIRUSTOTAL_API_KEY = "0e21d353d30719e5c0f552b4d0216e2acbca66e85d7e5c8a31679f97ae5ce09e"
+
 def calculate_md5(file_path):
-    """Calculate MD5 hash of a file."""
-    md5_hash = hashlib.md5()
+    hash_md5 = hashlib.md5()
     with open(file_path, "rb") as f:
         for chunk in iter(lambda: f.read(4096), b""):
-            md5_hash.update(chunk)
-    return md5_hash.hexdigest()
+            hash_md5.update(chunk)
+    return hash_md5.hexdigest()
 
-def scan_file_with_virustotal(api_key, file_path):
-    """Scan a file using VirusTotal API."""
-    url = "https://www.virustotal.com/api/v3/files"
-    headers = {
-        "x-apikey": api_key,
-    }
+def search_files(directory, filename):
+    hits = 0
+    searched_files = 0
 
-    md5_hash = calculate_md5(file_path)
-    params = {
-        "checksum": md5_hash,
-    }
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            if filename in file:
+                hits += 1
+                file_path = os.path.join(root, file)
+                file_size = os.path.getsize(file_path)
+                file_md5 = calculate_md5(file_path)
+                timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                
+                print(f"Timestamp: {timestamp}")
+                print(f"File Name: {file}")
+                print(f"File Size: {file_size} bytes")
+                print(f"File Path: {file_path}")
+                print(f"MD5 Hash: {file_md5}\n")
 
-    response = requests.get(url, headers=headers, params=params)
-    data = response.json()
-
-    positives = data["data"]["attributes"]["last_analysis_stats"]["malicious"]
-    total = data["data"]["attributes"]["last_analysis_stats"]["total"]
-
-    return positives, total
+                # Connect to VirusTotal API and check MD5 hash
+                params = {'apikey': VIRUSTOTAL_API_KEY, 'resource': file_md5}
+                response = requests.get('https://www.virustotal.com/vtapi/v2/file/report', params=params)
+                json_response = response.json()
+                
+                if json_response['response_code'] == 1:
+                    positives = json_response['positives']
+                    total = json_response['total']
+                    print(f"Positives Detected: {positives}")
+                    print(f"Total Files Scanned: {total}\n")
+                
+            searched_files += 1
+    
+    return searched_files, hits
 
 def main():
-    api_key = "0e21d353d30719e5c0f552b4d0216e2acbca66e85d7e5c8a31679f97ae5ce09e"
-    target_file = "C:\Users\reeds\Documents\virustotal.py"
-    
-    if not os.path.exists(target_file):
-        print("Target file not found.")
-        return
+    filename = input("Enter the file name to search for: ")
+    directory = input("Enter the directory to search in: ")
 
-    positives, total = scan_file_with_virustotal(api_key, target_file)
-    
-    print(f"Positives detected: {positives}")
-    print(f"Total files scanned: {total}")
+    if platform.system() == "Windows":
+        directory = directory.replace("/", "\\")
+
+    searched_files, hits = search_files(directory, filename)
+
+    print(f"\nSearch Summary:")
+    print(f"Total files searched: {searched_files}")
+    print(f"Total hits found: {hits}")
 
 if __name__ == "__main__":
     main()
