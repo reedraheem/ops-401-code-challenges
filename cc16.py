@@ -25,7 +25,7 @@ import hashlib
 import datetime
 import requests
 
-VIRUSTOTAL_API_KEY = "YOUR_API_KEY_HERE"
+VIRUSTOTAL_API_KEY = "0e21d353d30719e5c0f552b4d0216e2acbca66e85d7e5c8a31679f97ae5ce09e"
 
 def calculate_md5(file_path):
     hash_md5 = hashlib.md5()
