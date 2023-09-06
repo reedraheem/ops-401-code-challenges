@@ -47,3 +47,8 @@ elif resp == '3':
     print("Open Ports: ", open_ports)
 else:
     print("Please enter a valid option")
+### TODO: Select what your third scan type will be
+### TODO: Prompt the user to type in a port range for this tool to scan
+### TODO: Add missing code block 
+
+
