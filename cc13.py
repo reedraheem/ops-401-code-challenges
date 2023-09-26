@@ -1,6 +1,6 @@
 #! /usr/bin/python 3
 
-#Reference: Chat Gpt Assisted
+
 
 # Script:   code challenge 13          
 # Author: Raheem Sharif Reed                     
