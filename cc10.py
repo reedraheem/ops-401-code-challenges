@@ -1,6 +1,6 @@
 #! /usr/bin/python 3
 
-#Reference: 
+
 
 # Script:   code challenge 10           
 # Author: Raheem Sharif Reed                     
